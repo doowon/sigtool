@@ -2,6 +2,7 @@ package sigtool
 
 import (
 	"debug/pe"
+	"errors"
 	"os"
 )
 
@@ -23,6 +24,10 @@ func ExtractDigitalSignature(filePath string) (buf []byte, err error) {
 	case *pe.OptionalHeader64:
 		vAddr = t.DataDirectory[pe.IMAGE_DIRECTORY_ENTRY_SECURITY].VirtualAddress
 		size = t.DataDirectory[pe.IMAGE_DIRECTORY_ENTRY_SECURITY].Size
+	}
+
+	if vAddr <= 0 || size <= 0 {
+		return nil, errors.New("Not signed PE file")
 	}
 
 	f, err := os.Open(filePath)
